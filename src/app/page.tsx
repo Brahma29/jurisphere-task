@@ -3,33 +3,15 @@
 import React, { useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { UserInfoModal } from "./(page_components)/user-info-modal";
-import {
-  ArrowDown,
-  ArrowUp,
-  ArrowUpDown,
-  CircleAlert,
-  Loader2,
-} from "lucide-react";
+import { CircleAlert, Loader2 } from "lucide-react";
 import { TUser, TUserStatus, USER_STATUSES } from "@/types/user";
-import { TSortingDirection } from "@/types/common";
-import { TableHead } from "@/components/table/table-head";
-import { TableData } from "@/components/table/table-data";
 import { useGetAllUsers } from "@/hooks/api/user";
-
-type TCurrentSortConfig = {
-  key: keyof TUser | null;
-  direction: TSortingDirection;
-};
+import { DataTable } from "@/components/table/data-table";
 
 export default function Home() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [currentSortConfig, setCurrentSortConfig] =
-    useState<TCurrentSortConfig>({
-      key: null,
-      direction: "asc",
-    });
   const [nameFilter, setNameFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<TUserStatus | null>(null);
 
@@ -40,9 +22,9 @@ export default function Home() {
     ? data?.find((user) => user.id === parseInt(selectedUserId))
     : null;
 
-  const handleUserClick = (userId: number) => {
+  const handleUserClick = (user: TUser) => {
     const params = new URLSearchParams(searchParams);
-    params.set("user", userId.toString());
+    params.set("user", user.id.toString());
     router.replace(`?${params.toString()}`);
   };
 
@@ -50,34 +32,6 @@ export default function Home() {
     const params = new URLSearchParams(searchParams);
     params.delete("user");
     router.replace(`?${params.toString()}`);
-  };
-
-  const handleSort = (key: TCurrentSortConfig["key"]) => {
-    let direction: TSortingDirection = "asc";
-    if (
-      currentSortConfig.key === key &&
-      currentSortConfig.direction === "asc"
-    ) {
-      direction = "desc";
-    }
-    setCurrentSortConfig({ key, direction });
-  };
-
-  const sortData = (data: TUser[]) => {
-    if (!currentSortConfig.key) return data;
-
-    return [...data].sort((a, b) => {
-      const aValue = a[currentSortConfig.key!];
-      const bValue = b[currentSortConfig.key!];
-
-      if (aValue < bValue) {
-        return currentSortConfig.direction === "asc" ? -1 : 1;
-      }
-      if (aValue > bValue) {
-        return currentSortConfig.direction === "asc" ? 1 : -1;
-      }
-      return 0;
-    });
   };
 
   const filterData = (data: TUser[]) => {
@@ -95,23 +49,6 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [data, nameFilter, statusFilter]
   );
-
-  const filteredAndSortedData = useMemo(
-    () => sortData(filteredData),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [filteredData, currentSortConfig]
-  );
-
-  const getSortIcon = (columnKey: keyof TUser) => {
-    if (currentSortConfig.key !== columnKey) {
-      return <ArrowUpDown size={12} />;
-    }
-    return currentSortConfig.direction === "asc" ? (
-      <ArrowUp size={12} />
-    ) : (
-      <ArrowDown size={12} />
-    );
-  };
 
   return (
     <>
@@ -181,59 +118,33 @@ export default function Home() {
               </select>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <TableHead onClick={() => handleSort("id")}>
-                      <span>ID</span> {getSortIcon("id")}
-                    </TableHead>
-
-                    <TableHead onClick={() => handleSort("name")}>
-                      <span>Name</span> {getSortIcon("name")}
-                    </TableHead>
-
-                    <TableHead onClick={() => handleSort("email")}>
-                      <span>Email</span> {getSortIcon("email")}
-                    </TableHead>
-
-                    <TableHead onClick={() => handleSort("status")}>
-                      <span>Status</span> {getSortIcon("status")}
-                    </TableHead>
-                  </tr>
-                </thead>
-
-                <tbody className="divide-y divide-gray-100">
-                  {filteredAndSortedData.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={4}
-                        className="px-6 py-8 text-center text-gray-500"
-                      >
-                        {nameFilter || statusFilter
-                          ? "No users match your filters."
-                          : "No users found."}
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredAndSortedData.map((user, index) => (
-                      <tr
-                        key={user.id}
-                        onClick={() => handleUserClick(user.id)}
-                        className={`cursor-pointer transition-colors duration-150 hover:bg-blue-50 ${
-                          index % 2 === 0 ? "bg-white" : "bg-gray-25"
-                        }`}
-                      >
-                        <TableData>{user.id}</TableData>
-                        <TableData>{user.name}</TableData>
-                        <TableData>{user.email}</TableData>
-                        <TableData>{user.status}</TableData>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <DataTable
+              data={filteredData}
+              columns={[
+                {
+                  key: "id" as keyof TUser,
+                  label: "ID",
+                },
+                {
+                  key: "name" as keyof TUser,
+                  label: "Name",
+                },
+                {
+                  key: "email" as keyof TUser,
+                  label: "Email",
+                },
+                {
+                  key: "status" as keyof TUser,
+                  label: "Status",
+                },
+              ]}
+              onRowClick={handleUserClick}
+              emptyMessage={
+                nameFilter || statusFilter
+                  ? "No users match your filters."
+                  : "No users found."
+              }
+            />
           </>
         )}
       </div>
