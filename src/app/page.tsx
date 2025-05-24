@@ -7,6 +7,8 @@ import { UserInfoModal } from "./(components)/user-info-modal";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { TUser, TUserStatus, USER_STATUSES } from "@/types/user";
 import { TSortingDirection } from "@/types/common";
+import { TableHead } from "@/components/table/table-head";
+import { TableData } from "@/components/table/table-data";
 
 type TCurrentSortConfig = {
   key: keyof TUser | null;
@@ -104,108 +106,85 @@ export default function Home() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-10">
-      <h1 className="text-2xl font-bold">Manage Users</h1>
+    <>
+      <div className="max-w-4xl mx-auto py-10 px-6">
+        <h1 className="text-3xl font-bold text-gray-800 mb-8">Manage Users</h1>
+
+        <div className="my-6 flex gap-4">
+          <input
+            id="nameFilter"
+            type="text"
+            placeholder="Search by name..."
+            value={nameFilter}
+            onChange={(e) => setNameFilter(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
+          />
+
+          <select
+            id="statusFilter"
+            value={statusFilter || ""}
+            onChange={(e) =>
+              setStatusFilter(
+                e.target.value === "" ? null : (e.target.value as TUserStatus)
+              )
+            }
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none flex-1 min-w-36"
+          >
+            <option value="">All Status</option>
+
+            {USER_STATUSES.map((status) => (
+              <option key={status} value={status}>
+                {status.toUpperCase()}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <TableHead onClick={() => handleSort("id")}>
+                  <span>ID</span> {getSortIcon("id")}
+                </TableHead>
+
+                <TableHead onClick={() => handleSort("name")}>
+                  <span>Name</span> {getSortIcon("name")}
+                </TableHead>
+
+                <TableHead onClick={() => handleSort("email")}>
+                  <span>Email</span> {getSortIcon("email")}
+                </TableHead>
+
+                <TableHead onClick={() => handleSort("status")}>
+                  <span>Status</span> {getSortIcon("status")}
+                </TableHead>
+              </tr>
+            </thead>
+
+            <tbody className="divide-y divide-gray-100">
+              {filteredAndSortedData.map((user, index) => (
+                <tr
+                  key={user.id}
+                  onClick={() => handleUserClick(user.id)}
+                  className={`cursor-pointer transition-colors duration-150 hover:bg-blue-50 ${
+                    index % 2 === 0 ? "bg-white" : "bg-gray-25"
+                  }`}
+                >
+                  <TableData>{user.id}</TableData>
+                  <TableData>{user.name}</TableData>
+                  <TableData>{user.email}</TableData>
+                  <TableData>{user.status}</TableData>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       {selectedUser && (
         <UserInfoModal user={selectedUser} onClose={handleCloseModal} />
       )}
-
-      <div className="my-4 flex gap-4">
-        <input
-          id="nameFilter"
-          type="text"
-          placeholder="Search by name..."
-          value={nameFilter}
-          onChange={(e) => setNameFilter(e.target.value)}
-          className="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none "
-        />
-
-        <select
-          id="statusFilter"
-          value={statusFilter || ""}
-          onChange={(e) =>
-            setStatusFilter(
-              e.target.value === "" ? null : (e.target.value as TUserStatus)
-            )
-          }
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none flex-1 min-w-36"
-        >
-          <option value="">All Status</option>
-
-          {USER_STATUSES.map((status) => (
-            <option key={status} value={status}>
-              {status.toUpperCase()}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <table className="w-full">
-          <thead>
-            <tr>
-              <TableHead onClick={() => handleSort("id")}>
-                <div className="flex justify-between items-center">
-                  <span>ID</span> {getSortIcon("id")}
-                </div>
-              </TableHead>
-
-              <TableHead onClick={() => handleSort("name")}>
-                <div className="flex justify-between items-center">
-                  <span>Name</span> {getSortIcon("name")}
-                </div>
-              </TableHead>
-
-              <TableHead onClick={() => handleSort("email")}>
-                <div className="flex justify-between items-center">
-                  <span>Email</span> {getSortIcon("email")}
-                </div>
-              </TableHead>
-
-              <TableHead onClick={() => handleSort("status")}>
-                <div className="flex justify-between items-center">
-                  <span>Status</span> {getSortIcon("status")}
-                </div>
-              </TableHead>
-            </tr>
-          </thead>
-
-          <tbody>
-            {filteredAndSortedData.map((user) => (
-              <tr
-                key={user.id}
-                onClick={() => handleUserClick(user.id)}
-                className="cursor-pointer hover:bg-gray-50 transition-colors"
-              >
-                <TableData>{user.id}</TableData>
-                <TableData>{user.name}</TableData>
-                <TableData>{user.email}</TableData>
-                <TableData>{user.status}</TableData>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    </>
   );
 }
-
-const TableHead = ({
-  children,
-  onClick,
-}: {
-  children: React.ReactNode;
-  onClick?: () => void;
-}) => (
-  <th
-    className="text-left py-2 bg-gray-400 gap-2 items-center px-3 cursor-pointer"
-    onClick={onClick}
-  >
-    {children}
-  </th>
-);
-
-const TableData = ({ children }: { children: React.ReactNode }) => (
-  <td className="py-2 px-3">{children}</td>
-);
