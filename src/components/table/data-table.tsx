@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { TableHead } from "./table-head";
-import { TableData } from "./table-data";
+import { TableCell } from "./table-cell";
 import { TSortingDirection } from "@/types/common";
 
 export type TColumnConfig<T> = {
@@ -126,11 +126,11 @@ export const DataTable = <T extends Record<string, unknown>>({
                 } ${onRowClick ? "cursor-pointer" : ""}`}
               >
                 {columns.map((column) => (
-                  <TableData key={String(column.key)}>
+                  <TableCell key={String(column.key)}>
                     {column.render
                       ? column.render(item[column.key], item)
                       : String(item[column.key])}
-                  </TableData>
+                  </TableCell>
                 ))}
               </tr>
             ))

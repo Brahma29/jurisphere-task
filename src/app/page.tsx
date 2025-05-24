@@ -93,7 +93,7 @@ export default function Home() {
                 placeholder="Search by name..."
                 value={nameFilter}
                 onChange={(e) => setNameFilter(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-gray-500"
               />
 
               <select
