@@ -25,8 +25,6 @@ export default function Home() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const { data, isLoading, error } = useGetAllUsers();
-
   const [currentSortConfig, setCurrentSortConfig] =
     useState<TCurrentSortConfig>({
       key: null,
@@ -34,6 +32,8 @@ export default function Home() {
     });
   const [nameFilter, setNameFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<TUserStatus | null>(null);
+
+  const { data, isLoading, error } = useGetAllUsers();
 
   const selectedUserId = searchParams.get("user");
   const selectedUser = selectedUserId

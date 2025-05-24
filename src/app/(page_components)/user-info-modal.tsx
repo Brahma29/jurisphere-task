@@ -1,7 +1,7 @@
 import { Calendar, FileText, Mail, MapPin, X, Copy } from "lucide-react";
 import { TUser } from "@/types/user";
 import { formatDate } from "@/utils/functions";
-import { useState } from "react";
+import { toast } from "sonner";
 
 type TUserInfoModalParams = {
   user: TUser;
@@ -9,15 +9,10 @@ type TUserInfoModalParams = {
 };
 
 export const UserInfoModal = ({ user, onClose }: TUserInfoModalParams) => {
-  const [copied, setCopied] = useState(false);
-
-  console.log(user);
-
   const handleCopyEmail = async () => {
     try {
       await navigator.clipboard.writeText(user.email);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      toast.success("Email copied!");
     } catch (err) {
       console.error("Failed to copy email:", err);
     }
@@ -56,11 +51,6 @@ export const UserInfoModal = ({ user, onClose }: TUserInfoModalParams) => {
                     size={14}
                     className="text-gray-400 hover:text-gray-600"
                   />
-                  {copied && (
-                    <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                      Copied!
-                    </span>
-                  )}
                 </button>
               </div>
             </div>
