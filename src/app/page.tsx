@@ -110,7 +110,7 @@ export default function Home() {
       <div className="max-w-4xl mx-auto py-10 px-6">
         <h1 className="text-3xl font-bold text-gray-800 mb-8">Manage Users</h1>
 
-        <div className="my-6 flex gap-4">
+        <div className="my-6 flex gap-4 md:flex-row flex-col">
           <input
             id="nameFilter"
             type="text"
@@ -140,7 +140,7 @@ export default function Home() {
           </select>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
