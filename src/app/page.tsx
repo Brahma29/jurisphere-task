@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { UserInfoModal } from "./(components)/user-info-modal";
+import { UserInfoModal } from "./(page_components)/user-info-modal";
 import {
   ArrowDown,
   ArrowUp,
